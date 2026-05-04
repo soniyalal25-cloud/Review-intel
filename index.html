@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Review Intel — Real Product Review Analyser</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0A0A0F;--surface:#13131A;--surface2:#1C1C27;
+  --border:#2A2A3A;--text:#F0EFF8;--muted:#777;--muted2:#555;
+  --accent:#7F6AF0;--accent2:#A393F5;
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --amazon:#FF9900;--flipkart:#2874F0;--myntra:#FF3F6C;--nykaa:#FC2779;--swiggy:#FC8019;--zepto:#8B5CF6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
+.wrap{max-width:800px;margin:0 auto;padding:4rem 1.5rem 3rem;position:relative;z-index:1}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent2);margin-bottom:3rem;display:flex;align-items:center;gap:8px}
+.logo-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:1.08;margin-bottom:.75rem;letter-spacing:-.02em}
+h1 em{color:var(--accent2);font-style:normal}
+.sub{font-size:14px;color:var(--muted);margin-bottom:2.5rem;max-width:480px;line-height:1.65}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1.75rem;margin-bottom:1.5rem}
+.fsec{margin-bottom:1.25rem}.fsec:last-child{margin-bottom:0}
+.flabel{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:.5rem;display:block}
+.row{display:flex;gap:10px}
+input[type=text]{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:11px 15px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(127,106,240,.12)}
+input::placeholder{color:var(--muted2)}
+.btn{background:var(--accent);border:none;border-radius:10px;color:#fff;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;padding:11px 22px;white-space:nowrap;transition:all .2s}
+.btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.toggles{display:flex;gap:7px;flex-wrap:wrap}
+.tog{padding:6px 13px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tog.on{border-color:var(--accent);color:var(--accent2);background:rgba(127,106,240,.1)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .15s}
+.pill:hover{color:var(--text);border-color:var(--border)}
+.progress{display:none;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.pstep{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:13px;transition:all .3s}
+.pstep.active{border-color:var(--accent);background:rgba(127,106,240,.07)}
+.pstep.done{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.05)}
+.pstep.fail{border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.05)}
+.spin{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ptxt{flex:1}.ptitle{font-weight:500;color:var(--text)}.psub{font-size:11px;color:var(--muted);margin-top:1px}
+.err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:.875rem 1rem;font-size:14px;color:var(--red);display:none;margin-bottom:1rem}
+#out{display:none}
+.sec{margin-bottom:1.25rem}
+.seclabel{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:.875rem}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem}
+.conf-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;margin-bottom:1rem}
+.conf-live{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.conf-ai{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.pname{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:3px}
+.pbrand{font-size:13px;color:var(--muted);margin-bottom:10px}
+.stars{color:var(--amber);font-size:14px;letter-spacing:1px}
+.rdiv{border:none;border-top:1px solid var(--border);margin:.875rem 0}
+.summary{font-size:14px;color:#bbb;line-height:1.75}
+.bestfor{font-size:13px;color:var(--muted);margin-top:.6rem;font-style:italic}
+.snippet-list{display:flex;flex-direction:column;gap:8px}
+.snip{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.875rem 1rem}
+.snip-text{font-size:13px;color:#bbb;line-height:1.65;margin-bottom:6px;font-style:italic}
+.src-amazon{color:var(--amazon)}.src-flipkart{color:var(--flipkart)}.src-nykaa{color:var(--nykaa)}.src-myntra{color:var(--myntra)}.src-swiggy{color:var(--swiggy)}.src-zepto{color:var(--zepto)}
+.score-row{margin-bottom:12px}
+.score-hd{display:flex;justify-content:space-between;margin-bottom:4px}
+.track{height:5px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.fill{height:100%;border-radius:4px}
+.sbar{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.sbar-l{font-size:12px;color:var(--muted);width:58px}
+.sbar-t{flex:1;height:4px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.sbar-f{height:100%;border-radius:4px}
+.sbar-p{font-size:11px;color:var(--muted);width:30px;text-align:right}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}
+.store-card{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:.875rem}
+.store-card.off{opacity:.35}
+.sname{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.sprice{font-size:19px;font-weight:500;margin-bottom:3px}
+.sdetail{font-size:12px;color:var(--muted)}
+.snote{font-size:11px;color:var(--green);margin-top:4px}
+.sverified{font-size:10px;color:var(--green);margin-top:5px}
+.sest{font-size:10px;color:var(--muted);margin-top:5px;font-style:italic}
+.tagwrap{display:flex;gap:.875rem;flex-wrap:wrap}
+.taggroup{flex:1;min-width:175px}
+.tagtitle{font-size:12px;font-weight:500;margin-bottom:7px}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;margin:3px 2px 3px 0}
+.pos{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.18)}
+.neg{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.18)}
+.neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.alt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.alt-card{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:.875rem}
+.alt-card.top{border-color:var(--accent);background:rgba(127,106,240,.06)}
+.top-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent2);background:rgba(127,106,240,.15);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:7px}
+.aname{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:2px}
+.abrand{font-size:12px;color:var(--muted);margin-bottom:6px}
+.areason{font-size:12px;color:#999;line-height:1.5;margin:.4rem 0 .5rem}
+.aprice{font-size:15px;font-weight:500;margin-bottom:.4rem}
+.adots{display:flex;gap:4px}
+.adot{width:7px;height:7px;border-radius:50%}
+.d-amazon{background:var(--amazon)}.d-flipkart{background:var(--flipkart)}.d-myntra{background:var(--myntra)}.d-nykaa{background:var(--nykaa)}.d-swiggy{background:var(--swiggy)}.d-zepto{background:var(--zepto)}
+.verdict{background:linear-gradient(100deg,rgba(127,106,240,.12),rgba(163,147,245,.06));border:1px solid rgba(127,106,240,.25);border-radius:11px;padding:.875rem 1.1rem;font-size:14px;line-height:1.65;margin-bottom:.75rem}
+.verdict strong{color:var(--accent2)}
+.disclaimer{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;font-size:12px;color:var(--muted);line-height:1.6}
+.footer{text-align:center;padding:3rem 1.5rem 1rem;font-size:12px;color:var(--muted2);border-top:1px solid var(--border);margin-top:2rem}
+.footer a{color:var(--accent2);text-decoration:none}
+@media(max-width:500px){.row{flex-direction:column}h1{font-size:1.9rem}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+  <div class="logo"><div class="logo-dot"></div>Review Intel</div>
+  <h1>Real reviews.<br><em>Real prices.</em></h1>
+  <p class="sub">Live data fetched from Amazon, Flipkart, Nykaa & Myntra — summarised by AI. No made-up data.</p>
+
+  <div class="card">
+    <div class="fsec">
+      <label class="flabel">Product URL or name</label>
+      <div class="row">
+        <input type="text" id="qin" placeholder="e.g. CeraVe moisturising cream, or paste an Amazon/Nykaa URL…"/>
+        <button class="btn" id="gobtn" onclick="analyse()">Analyse →</button>
+      </div>
+    </div>
+    <div class="fsec">
+      <label class="flabel">Platforms</label>
+      <div class="toggles">
+        <button class="tog on" data-s="amazon"   onclick="toggleSrc(this)">Amazon</button>
+        <button class="tog on" data-s="flipkart" onclick="toggleSrc(this)">Flipkart</button>
+        <button class="tog on" data-s="myntra"   onclick="toggleSrc(this)">Myntra</button>
+        <button class="tog on" data-s="nykaa"    onclick="toggleSrc(this)">Nykaa</button>
+        <button class="tog on" data-s="swiggy"   onclick="toggleSrc(this)">Swiggy Instamart</button>
+        <button class="tog on" data-s="zepto"    onclick="toggleSrc(this)">Zepto</button>
+      </div>
+    </div>
+    <div class="fsec">
+      <label class="flabel">Quick examples</label>
+      <div class="pills">
+        <button class="pill" onclick="setQ('CeraVe Moisturising Cream')">CeraVe moisturiser</button>
+        <button class="pill" onclick="setQ('Mamaearth Onion Hair Oil 250ml')">Mamaearth hair oil</button>
+        <button class="pill" onclick="setQ('Lakme 9to5 Primer Matte Foundation')">Lakmé foundation</button>
+        <button class="pill" onclick="setQ('MuscleBlaze Whey Gold 1kg')">Whey protein</button>
+        <button class="pill" onclick="setQ('Nivea Soft Light Moisturiser')">Nivea moisturiser</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <div class="progress" id="prog">
+    <div class="pstep active" id="ps1">
+      <div id="pi1" class="spin"></div>
+      <div class="ptxt"><div class="ptitle">Searching live review data…</div><div class="psub" id="psub1">Fetching from Amazon, Flipkart, Nykaa, Myntra</div></div>
+    </div>
+    <div class="pstep" id="ps2" style="display:none">
+      <div id="pi2" class="spin"></div>
+      <div class="ptxt"><div class="ptitle">Reading prices and reviews…</div><div class="psub" id="psub2">Extracting real data</div></div>
+    </div>
+    <div class="pstep" id="ps3" style="display:none">
+      <div id="pi3" class="spin"></div>
+      <div class="ptxt"><div class="ptitle">AI summarising real data…</div><div class="psub">Only using what was actually found</div></div>
+    </div>
+  </div>
+
+  <div id="out">
+    <div class="sec"><div class="panel" id="p-overview"></div></div>
+    <div class="sec"><div class="seclabel">Real review snippets</div><div id="p-snippets"></div></div>
+    <div class="sec"><div class="seclabel">Sentiment analysis</div><div class="panel" id="p-sentiment"></div></div>
+    <div class="sec"><div class="seclabel">Prices across platforms</div><div class="store-grid" id="p-stores"></div></div>
+    <div class="sec"><div class="seclabel">What reviewers say</div><div class="panel" id="p-reviews"></div></div>
+    <div class="sec"><div class="seclabel">Alternatives to consider</div><div class="alt-grid" id="p-alts"></div></div>
+    <div class="verdict" id="p-verdict"></div>
+    <div class="disclaimer" id="p-disclaimer"></div>
+  </div>
+
+  <div class="footer">
+    Live data via Google Search · Summarised by <a href="https://groq.com" target="_blank">Llama 3.3</a> on Groq · Built with <a href="https://claude.ai" target="_blank">Claude</a>
+  </div>
+</div>
+
+<script>
+const PLATFORMS = {
+  amazon:   {label:'Amazon',          color:'var(--amazon)',   cls:'src-amazon',   dot:'d-amazon'},
+  flipkart: {label:'Flipkart',        color:'var(--flipkart)', cls:'src-flipkart', dot:'d-flipkart'},
+  myntra:   {label:'Myntra',          color:'var(--myntra)',   cls:'src-myntra',   dot:'d-myntra'},
+  nykaa:    {label:'Nykaa',           color:'var(--nykaa)',    cls:'src-nykaa',    dot:'d-nykaa'},
+  swiggy:   {label:'Swiggy Instamart',color:'var(--swiggy)',   cls:'src-swiggy',   dot:'d-swiggy'},
+  zepto:    {label:'Zepto',           color:'var(--zepto)',    cls:'src-zepto',    dot:'d-zepto'},
+};
+const active = new Set(['amazon','flipkart','myntra','nykaa','swiggy','zepto']);
+
+function toggleSrc(el){const s=el.dataset.s;if(active.has(s)){active.delete(s);el.classList.remove('on')}else{active.add(s);el.classList.add('on')}}
+function setQ(t){document.getElementById('qin').value=t}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';e.scrollIntoView({behavior:'smooth',block:'center'})}
+function hideErr(){document.getElementById('err').style.display='none'}
+function starsHtml(r){if(!r)return'—';const f=Math.floor(r),h=r%1>=0.5;return'★'.repeat(f)+(h?'½':'')+'☆'.repeat(5-f-(h?1:0))}
+function sc(s){return s>=7?'var(--green)':s>=5?'var(--amber)':'var(--red)'}
+function rc(r){return r>=4.2?'var(--green)':r>=3.5?'var(--amber)':'var(--red)'}
+function scoreBar(label,score){
+  if(!score)return`<div class="score-row"><div class="score-hd"><span style="font-size:13px">${label}</span><span style="font-size:13px;color:var(--muted)">Insufficient data</span></div></div>`;
+  const c=sc(score);
+  return`<div class="score-row"><div class="score-hd"><span style="font-size:13px">${label}</span><span style="font-size:13px;font-weight:500;color:${c}">${score.toFixed(1)}/10</span></div><div class="track"><div class="fill" style="width:${score*10}%;background:${c}"></div></div></div>`;
+}
+function dot(s){return`<div class="adot ${PLATFORMS[s]?.dot||''}" title="${PLATFORMS[s]?.label||s}"></div>`}
+
+function stepDone(n,sub){
+  const el=document.getElementById('ps'+n);if(!el)return;
+  el.className='pstep done';
+  const ic=document.getElementById('pi'+n);
+  if(ic)ic.outerHTML=`<span id="pi${n}" style="color:var(--green);font-size:15px;width:14px;text-align:center">✓</span>`;
+  if(sub){const s=document.getElementById('psub'+n);if(s)s.textContent=sub}
+}
+function stepOn(n,sub){
+  const el=document.getElementById('ps'+n);if(!el)return;
+  el.style.display='flex';el.className='pstep active';
+  if(sub){const s=document.getElementById('psub'+n);if(s)s.textContent=sub}
+}
+
+async function analyse(){
+  const q=document.getElementById('qin').value.trim();
+  if(!q){showErr('Please enter a product name or URL.');return}
+  hideErr();
+  document.getElementById('out').style.display='none';
+  document.getElementById('gobtn').disabled=true;
+  document.getElementById('prog').style.display='flex';
+  ['ps1','ps2','ps3'].forEach((id,i)=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.className='pstep'+(i===0?' active':'');
+    if(i>0)el.style.display='none';
+    const ic=document.getElementById('pi'+(i+1));
+    if(ic&&ic.tagName==='SPAN')ic.outerHTML=`<div class="spin" id="pi${i+1}"></div>`;
+  });
+
+  const srcs=[...active];
+  stepOn(1,'Searching '+srcs.map(s=>PLATFORMS[s]?.label).join(', '));
+
+  try{
+    const res = await fetch('/analyse',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({query:q, sources:srcs})
+    });
+
+    stepDone(1,'Live web search complete');
+    stepOn(2,'Reading prices and reviews'); document.getElementById('ps2').style.display='flex';
+    await new Promise(r=>setTimeout(r,500));
+
+    if(!res.ok){const e=await res.json();throw new Error(e.error||'Server error '+res.status)}
+    const d=await res.json();
+
+    stepDone(2,`Data extracted — ${d.review_snippets?.length||0} review snippets`);
+    stepOn(3); document.getElementById('ps3').style.display='flex';
+    await new Promise(r=>setTimeout(r,400));
+    stepDone(3,'Analysis complete');
+
+    setTimeout(()=>{
+      document.getElementById('prog').style.display='none';
+      render(d,srcs);
+    },400);
+
+  }catch(e){
+    document.getElementById('prog').style.display='none';
+    showErr('Analysis failed: '+e.message);
+    console.error(e);
+  }
+  document.getElementById('gobtn').disabled=false;
+}
+
+function render(d,srcs){
+  const sd=d.source_data||{},ss=d.sentiment_scores||{},sb=d.sentiment_breakdown||{};
+  const isLive=d.data_source==='live_web_search';
+
+  document.getElementById('p-overview').innerHTML=`
+    <span class="conf-badge ${isLive?'conf-live':'conf-ai'}">
+      ${isLive?'✓ Based on live web search data':'~ Based on AI training data — verify prices before buying'}
+    </span>
+    <div class="pname">${d.product_name||''}</div>
+    <div class="pbrand">${d.brand||''} · ${d.category||''}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      ${d.overall_rating
+        ?`<span class="stars">${starsHtml(d.overall_rating)}</span>
+          <span style="font-size:16px;font-weight:500;color:${rc(d.overall_rating)}">${d.overall_rating.toFixed(1)}</span>
+          ${d.total_reviews?`<span style="font-size:12px;color:var(--muted)">${Number(d.total_reviews).toLocaleString()} reviews</span>`:''}`
+        :'<span style="color:var(--muted);font-size:14px">Rating not confirmed</span>'}
+    </div>
+    ${d.rating_basis?`<div style="font-size:12px;color:var(--muted);margin-bottom:.75rem;font-style:italic">${d.rating_basis}</div>`:''}
+    <div class="rdiv"></div>
+    <div class="summary">${d.overall_summary||''}</div>
+    ${d.best_for?`<div class="bestfor">Best for: ${d.best_for}</div>`:''}`;
+
+  const snips=d.review_snippets||[];
+  document.getElementById('p-snippets').innerHTML=snips.length
+    ?`<div class="snippet-list">${snips.map(s=>{
+        const cfg=PLATFORMS[s.platform]||{};
+        return`<div class="snip">
+          <div class="snip-text">"${s.text}"</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;font-weight:600;color:${cfg.color||'var(--muted)'}">${cfg.label||s.platform}</span>
+            <span style="font-size:11px;color:var(--muted);background:var(--surface2);padding:1px 7px;border-radius:10px">${s.sentiment||''}</span>
+          </div>
+        </div>`;
+      }).join('')}</div>`
+    :`<div class="panel" style="text-align:center;padding:1.5rem;color:var(--muted);font-size:14px">No review snippets found for this product.</div>`;
+
+  document.getElementById('p-sentiment').innerHTML=`
+    ${scoreBar('Quality',ss.quality)}
+    ${scoreBar('Value for money',ss.value_for_money)}
+    ${scoreBar('Efficacy / performance',ss.efficacy)}
+    <div class="rdiv"></div>
+    <div style="font-family:Syne,sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:.5rem">Sentiment breakdown</div>
+    <div class="sbar"><span class="sbar-l" style="color:var(--green)">Positive</span><div class="sbar-t"><div class="sbar-f" style="width:${sb.positive||0}%;background:var(--green)"></div></div><span class="sbar-p">${sb.positive||0}%</span></div>
+    <div class="sbar"><span class="sbar-l" style="color:var(--muted)">Neutral</span><div class="sbar-t"><div class="sbar-f" style="width:${sb.neutral||0}%;background:var(--muted)"></div></div><span class="sbar-p">${sb.neutral||0}%</span></div>
+    <div class="sbar"><span class="sbar-l" style="color:var(--red)">Negative</span><div class="sbar-t"><div class="sbar-f" style="width:${sb.negative||0}%;background:var(--red)"></div></div><span class="sbar-p">${sb.negative||0}%</span></div>`;
+
+  document.getElementById('p-stores').innerHTML=Object.entries(PLATFORMS).filter(([k])=>srcs.includes(k)).map(([k,cfg])=>{
+    const v=sd[k]||{};
+    if(!v.available)return`<div class="store-card off"><div class="sname" style="color:${cfg.color}">${cfg.label}</div><div style="font-size:12px;color:var(--muted)">Not in this category</div></div>`;
+    return`<div class="store-card">
+      <div class="sname" style="color:${cfg.color}">${cfg.label}</div>
+      <div class="sprice">${v.price||'—'}</div>
+      <div class="sdetail">${v.rating?`<span style="color:var(--amber)">${starsHtml(v.rating)}</span> ${v.rating.toFixed(1)}`:'No rating'}${v.reviews?` · ${Number(v.reviews).toLocaleString()}`:''}</div>
+      ${v.note?`<div class="snote">⚡ ${v.note}</div>`:''}
+      <div class="${v.verified?'sverified':'sest'}">${v.verified?'✓ Live price':'~ Estimated'}</div>
+    </div>`;
+  }).join('');
+
+  const pros=(d.pros||[]).map(p=>`<span class="tag pos">✓ ${p}</span>`).join('');
+  const cons=(d.cons||[]).map(c=>`<span class="tag neg">✗ ${c}</span>`).join('');
+  const neus=(d.neutral_points||[]).map(n=>`<span class="tag neu">• ${n}</span>`).join('');
+  document.getElementById('p-reviews').innerHTML=`
+    <div class="tagwrap">
+      <div class="taggroup"><div class="tagtitle" style="color:var(--green)">Praised by reviewers</div>${pros||'<span style="font-size:13px;color:var(--muted)">No data</span>'}</div>
+      <div class="taggroup"><div class="tagtitle" style="color:var(--red)">Criticised by reviewers</div>${cons||'<span style="font-size:13px;color:var(--muted)">No data</span>'}</div>
+    </div>
+    ${neus?`<div style="margin-top:.875rem"><div class="tagtitle" style="color:var(--muted)">Also noted</div>${neus}</div>`:''}`;
+
+  document.getElementById('p-alts').innerHTML=(d.alternatives||[]).map(a=>`
+    <div class="alt-card ${a.recommended?'top':''}">
+      ${a.recommended?'<div class="top-badge">Top pick</div>':''}
+      <div class="aname">${a.name}</div><div class="abrand">${a.brand}</div>
+      ${a.rating?`<div style="color:var(--amber);font-size:13px">${starsHtml(a.rating)} <span style="color:var(--muted);font-size:12px">${a.rating.toFixed(1)}</span></div>`:''}
+      <div class="aprice">${a.price||'—'}</div>
+      <div class="areason">${a.reason}</div>
+      <div class="adots">${(a.stores||[]).map(s=>dot(s)).join('')}</div>
+    </div>`).join('')||'<div class="panel" style="color:var(--muted);font-size:13px;padding:1rem">No alternatives found.</div>';
+
+  document.getElementById('p-verdict').innerHTML=`<strong>Bottom line:</strong> ${d.verdict||'See summary above.'}`;
+  document.getElementById('p-disclaimer').innerHTML=`<strong>Data source:</strong> ${isLive?'Prices and reviews fetched live from Google Search results across platforms.':'AI training data used — prices may not reflect current market. Always verify on the platform before purchasing.'}`;
+  document.getElementById('out').style.display='block';
+  document.getElementById('out').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.getElementById('qin').addEventListener('keydown',e=>{if(e.key==='Enter')analyse()});
+</script>
+</body>
+</html>
